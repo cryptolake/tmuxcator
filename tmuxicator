@@ -1,0 +1,104 @@
+#!/bin/bash
+create-config()
+{
+	template="
+  #!/bin/bash \n
+	name=projname \n
+
+	#command for main window\n
+	cmd=nvim \n
+
+	#split man window
+	split=yes \n
+	split_cmd= \n
+
+	root=~/Documents/prog/ \n
+
+	layout='main-vertical' \n
+
+	# additional windows \n
+	#windows=('window1_name' 'window2_name') \n
+	windows=(vim ls) \n
+  \n
+	"
+	if [ ! -d $cfdir ]; then
+		mkdir $cfdir
+	fi
+
+	if [ ! -f $cfile ]; then
+		touch $cfile
+		echo -e $template > $cfile
+	fi
+	$EDITOR $cfile
+}
+
+tmuxination()
+{
+	source $cfile
+	cd $root
+	tmux new-session -d -s $name $cmd
+	if [ "$split" == "yes" ]; then
+		tmux split-window -t $cmd $split_cmd
+	fi
+	for window in ${windows[*]}
+	do
+		tmux new-window -n "$window" -t $name
+	done
+
+	tmux select-window -t $cmd
+	tmux select-layout $layout
+	tmux attach-session -E -t $name
+}
+
+
+cfdir="$XDG_CONFIG_HOME/tmuxicator"
+
+case $1 in
+	new)
+		if [ ! -z "$2" -a "$2" != " " ]; then 
+		cfile=$cfdir/$2
+		create-config
+		else 
+			echo "check the <name> of the project"
+		fi
+		;;
+	list)
+		ls $cfdir
+		;;
+	edit)
+	if [ ! -z "$2" -a "$2" != " " ]; then 
+		cfile=$cfdir/$2
+		$EDITOR $cfile
+		else 
+			echo "check the <name> of the project"
+	fi
+		;;
+	open)
+		if [ ! -z "$2" -a "$2" != " " ]; then 
+		cfile=$cfdir/$2
+		tmuxination
+		else 
+			echo "check the <name> of the project"
+		fi
+		;;
+	delete)
+		if [ ! -z "$2" -a "$2" != " " ]; then 
+		cfile=$cfdir/$2
+		rm $cfile
+		else 
+			echo "check the <name> of the project"
+		fi
+		;;
+	help)
+	echo "Commands:
+	new  <name>: new config with name of <name>.
+	open <name>: open tmux <name> session.
+	edit <name>: edit <name> config.
+	list : list configs.
+	delete <name>: delete <name> config.
+	help : show this."
+		;;
+	*)
+		echo "Unknow command check: tmuxicator help"
+		;;
+esac
