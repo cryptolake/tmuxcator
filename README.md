@@ -1,4 +1,4 @@
-# tmuxicator
+# tmuxcator
 A script to manage tmux like [tmuxinator](https://github.com/tmuxinator/tmuxinator).
 
 ## Why?
