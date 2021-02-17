@@ -1,32 +1,13 @@
 #!/bin/bash
 create-config()
 {
-	template="
-  #!/bin/bash \n
-	#project name and direcotry\n
-	name=projname \n
-	root=~/Documents/prog/ \n
-	\n
-	#panes with 'pane1_cmd:pane2_cmd,layout'\n
-	main_panes='nvim:zsh,main-vertical'\n
-	\n
-	\n
-	\n
-	\n
-	# additional windows \n
-  #Always put the window definition inside '' like and example above. \n
-	\n
-	#windows=('window_cmd:pane1_cmd' 'window2_cmd:pane2_cmd') \n
-	windows=('python:gdb,main-vertical' 'zsh,main-vertical') \n
-  \n
-	"
 	if [ ! -d $cfdir ]; then
 		mkdir $cfdir
 	fi
 
 	if [ ! -f $cfile ]; then
 		touch $cfile
-		echo -e $template > $cfile
+		cat template > $cfile
 	fi
 	$EDITOR $cfile
 }
@@ -34,20 +15,21 @@ create-config()
 tmuxination()
 {
 	source $cfile
+	local IFS="."
 	cd $root
 	main_layout="$(echo $main_panes | cut -d',' -f 2)"
 	main_panes="$(echo $main_panes | cut -d',' -f 1)"
 	cmd="$(echo $main_panes | cut -d':' -f 1)"
 	tmux new-session -d -s $name $cmd
 	
-	panes=($(echo $main_panes | tr ":" " "))
-	for pane in "${panes[@]:1}"; do
+	panes=($(echo $main_panes | tr ":" "."))
+	for pane in ${panes[*]:1}; do
 		tmux split-window -t $name:0 $pane;
 	done
 	tmux select-layout -t $name:0 $main_layout
 
   ((i=1))
-	for window in "${windows[@]}";
+	for window in ${windows[*]};
 	do
 		winlayout="$(echo $window | cut -d',' -f 2)";
 		window="$(echo $window | cut -d',' -f 1)";
@@ -56,7 +38,7 @@ tmuxination()
 		tmux new-window -t $name:$i $cmdw;
 		#sleep 1
 
-		wpanes=($(echo $window | tr ":" " "))
+		wpanes=($(echo $window | tr ":" "."))
 		for wpane in "${wpanes[@]:1}"; do
 			#echo 'making pane '$wpane' in window '$i
 			tmux split-window -t $name:$i $wpane
