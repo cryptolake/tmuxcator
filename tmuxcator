@@ -4,10 +4,28 @@ create-config()
 	if [ ! -d $cfdir ]; then
 		mkdir $cfdir
 	fi
-
+template="
+#!/bin/bash  \n
+ #project name and direcotry\n
+ name=projname \n
+ root=~/Documents/prog/ \n
+ \n
+ #panes with 'pane1_cmd:pane2_cmd,layout'\n
+ main_panes='nvim:zsh,main-vertical'\n
+ \n
+ \n
+ \n
+ \n
+ # additional windows \n
+ #Always put the window definition inside '' like and example above. \n
+ \n
+ #windows=('window_cmd:pane1_cmd'.'window2_cmd:pane2_cmd') \n
+ #each window definition is seperated by . \n
+ windows=('python:gdb,main-vertical'.'zsh,main-vertical') \n
+"
 	if [ ! -f $cfile ]; then
 		touch $cfile
-		cat template > $cfile
+		echo -e $template > $cfile
 	fi
 	$EDITOR $cfile
 }
@@ -53,7 +71,7 @@ tmuxination()
 }
 
 
-cfdir="$XDG_CONFIG_HOME/tmuxicator"
+cfdir="$XDG_CONFIG_HOME/tmuxcator"
 
 case $1 in
 	new)
