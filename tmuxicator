@@ -8,7 +8,7 @@ create-config()
 	#command for main window\n
 	cmd=nvim \n
 
-	#split man window
+	#split main window\n
 	split=yes \n
 	split_cmd= \n
 
