@@ -40,21 +40,24 @@ tmuxination()
 	tmux new-session -d -s $name $cmd
 	
 	panes=($(echo $main_panes | tr ":" " "))
-	for pane in ${panes[*]:1}; do
+	for pane in "${panes[@]:1}"; do
 		tmux split-window -t $name:0 $pane;
 	done
 	tmux select-layout -t $name:0 $main_layout
 
   ((i=1))
-	for window in ${windows[*]}
+	for window in "${windows[@]}";
 	do
 		winlayout="$(echo $window | cut -d',' -f 2)";
 		window="$(echo $window | cut -d',' -f 1)";
 		cmdw="$(echo $window | cut -d':' -f 1)";
+		#echo 'making window '$i
 		tmux new-window -t $name:$i $cmdw;
+		#sleep 1
 
 		wpanes=($(echo $window | tr ":" " "))
-		for wpane in ${wpanes[*]:1}; do
+		for wpane in "${wpanes[@]:1}"; do
+			#echo 'making pane '$wpane' in window '$i
 			tmux split-window -t $name:$i $wpane
 		done
 		tmux select-layout -t $name:$i $winlayout
