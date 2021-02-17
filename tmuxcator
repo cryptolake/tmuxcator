@@ -36,6 +36,7 @@ tmuxination()
 	local IFS="."
 	cd $root
 	main_layout="$(echo $main_panes | cut -d',' -f 2)"
+	main_layout="$(echo $main_layout | cut -d' ' -f 1)"
 	main_panes="$(echo $main_panes | cut -d',' -f 1)"
 	cmd="$(echo $main_panes | cut -d':' -f 1)"
 	tmux new-session -d -s $name $cmd
@@ -50,6 +51,7 @@ tmuxination()
 	for window in ${windows[*]};
 	do
 		winlayout="$(echo $window | cut -d',' -f 2)";
+		winlayout="$(echo $winlayout | cut -d' ' -f 1)";
 		window="$(echo $window | cut -d',' -f 1)";
 		cmdw="$(echo $window | cut -d':' -f 1)";
 		#echo 'making window '$i
@@ -66,7 +68,6 @@ tmuxination()
 	done
 
 	tmux select-window -t $cmd
-	tmux select-layout $layout
 	tmux attach-session -E -t $name
 }
 
@@ -93,7 +94,7 @@ case $1 in
 			echo "check the <name> of the project"
 	fi
 		;;
-	open)
+	o)
 		if [ ! -z "$2" -a "$2" != " " ]; then 
 		cfile=$cfdir/$2
 		tmuxination
@@ -101,7 +102,7 @@ case $1 in
 			echo "check the <name> of the project"
 		fi
 		;;
-	delete)
+	rm)
 		if [ ! -z "$2" -a "$2" != " " ]; then 
 		cfile=$cfdir/$2
 		rm $cfile
@@ -112,19 +113,19 @@ case $1 in
 	help)
 	echo "Tmuxinator Commands:
 	new  <name>: new config with name of <name>.
-	open <name>: open tmux <name> session.
+	o <name>: open tmux <name> session.
 	edit <name>: edit <name> config.
 	list : list configs.
-	delete <name>: delete <name> config.
+	rm <name>: delete <name> config.
 	help : show this."
 		;;
 	*)
 	echo "Tmuxinator Commands:
 	new  <name>: new config with name of <name>.
-	open <name>: open tmux <name> session.
+	o <name>: open tmux <name> session.
 	edit <name>: edit <name> config.
 	list : list configs.
-	delete <name>: delete <name> config.
+	rm <name>: delete <name> config.
 	help : show this."
 		;;
 esac
