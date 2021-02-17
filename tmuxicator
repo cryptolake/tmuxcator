@@ -3,22 +3,20 @@ create-config()
 {
 	template="
   #!/bin/bash \n
+	#project name and direcotry\n
 	name=projname \n
-
-	#command for main window\n
-	cmd=nvim \n
-
-	#split main window\n
-	split=yes \n
-	split_cmd= \n
-
 	root=~/Documents/prog/ \n
-
-	layout='main-vertical' \n
-
+	\n
+	#panes with 'pane1_cmd:pane2_cmd,layout'\n
+	main_panes='nvim:zsh,main-vertical'\n
+	\n
+	\n
+	\n
+	\n
 	# additional windows \n
-	#windows=('window1_name' 'window2_name') \n
-	windows=(vim ls) \n
+	\n
+	#windows=('window_cmd:pane1_cmd' 'window2_cmd:pane2_cmd') \n
+	windows=('python:gdb,main-vertical' 'zsh,main-vertical') \n
   \n
 	"
 	if [ ! -d $cfdir ]; then
@@ -36,13 +34,31 @@ tmuxination()
 {
 	source $cfile
 	cd $root
+	main_layout="$(echo $main_panes | cut -d',' -f 2)"
+	main_panes="$(echo $main_panes | cut -d',' -f 1)"
+	cmd="$(echo $main_panes | cut -d':' -f 1)"
 	tmux new-session -d -s $name $cmd
-	if [ "$split" == "yes" ]; then
-		tmux split-window -t $cmd $split_cmd
-	fi
+	
+	panes=($(echo $main_panes | tr ":" " "))
+	for pane in ${panes[*]:1}; do
+		tmux split-window -t $name:0 $pane;
+	done
+	tmux select-layout -t $name:0 $main_layout
+
+  ((i=1))
 	for window in ${windows[*]}
 	do
-		tmux new-window -n "$window" -t $name
+		winlayout="$(echo $window | cut -d',' -f 2)";
+		window="$(echo $window | cut -d',' -f 1)";
+		cmdw="$(echo $window | cut -d':' -f 1)";
+		tmux new-window -t $name:$i $cmdw;
+
+		wpanes=($(echo $window | tr ":" " "))
+		for wpane in ${wpanes[*]:1}; do
+			tmux split-window -t $name:$i $wpane
+		done
+		tmux select-layout -t $name:$i $winlayout
+		((i+=1));
 	done
 
 	tmux select-window -t $cmd
@@ -90,7 +106,7 @@ case $1 in
 		fi
 		;;
 	help)
-	echo "Commands:
+	echo "Tmuxinator Commands:
 	new  <name>: new config with name of <name>.
 	open <name>: open tmux <name> session.
 	edit <name>: edit <name> config.
@@ -99,6 +115,12 @@ case $1 in
 	help : show this."
 		;;
 	*)
-		echo "Unknow command check: tmuxicator help"
+	echo "Tmuxinator Commands:
+	new  <name>: new config with name of <name>.
+	open <name>: open tmux <name> session.
+	edit <name>: edit <name> config.
+	list : list configs.
+	delete <name>: delete <name> config.
+	help : show this."
 		;;
 esac
