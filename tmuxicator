@@ -14,6 +14,7 @@ create-config()
 	\n
 	\n
 	# additional windows \n
+  #Always put the window definition inside '' like and example above. \n
 	\n
 	#windows=('window_cmd:pane1_cmd' 'window2_cmd:pane2_cmd') \n
 	windows=('python:gdb,main-vertical' 'zsh,main-vertical') \n
