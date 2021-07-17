@@ -1,9 +1,11 @@
 #!/bin/bash
 create-config()
 {
+	# create config directory if not exist
 	if [ ! -d $cfdir ]; then
 		mkdir $cfdir
 	fi
+# standard template layout 
 template="
 #!/bin/bash  \n
  #project name and direcotry\n
@@ -23,6 +25,7 @@ template="
  #each window definition is seperated by . \n
  windows=('python:gdb,main-vertical'.'zsh,main-vertical') \n
 "
+# create config file if non existant
 	if [ ! -f $cfile ]; then
 		touch $cfile
 		echo -e $template > $cfile
@@ -32,22 +35,40 @@ template="
 
 tmuxination()
 {
+
+	#source the config file
 	source $cfile
+
+	#create project root if non existant
+	if [ -f $root ]; then
+		mkdir -pv $root
+		cd $root
+	else
+		cd $root
+	fi
+
+	#use . as seperator in bash arrays
 	local IFS="."
-	cd $root
+
+	#assign main layout and commands
 	main_layout="$(echo $main_panes | cut -d',' -f 2)"
 	main_layout="$(echo $main_layout | cut -d' ' -f 1)"
 	main_panes="$(echo $main_panes | cut -d',' -f 1)"
 	cmd="$(echo $main_panes | cut -d':' -f 1)"
+
+	#launch the tmux session
 	tmux new-session -d -s $name $cmd
 	
+	#assign main panes
 	panes=($(echo $main_panes | tr ":" "."))
 	for pane in ${panes[*]:1}; do
 		tmux split-window -t $name:0 $pane;
 	done
+	# set the layout
 	tmux select-layout -t $name:0 $main_layout
 
   ((i=1))
+  	# for each window in config 
 	for window in ${windows[*]};
 	do
 		winlayout="$(echo $window | cut -d',' -f 2)";
@@ -61,12 +82,15 @@ tmuxination()
 		wpanes=($(echo $window | tr ":" "."))
 		for wpane in "${wpanes[@]:1}"; do
 			#echo 'making pane '$wpane' in window '$i
+			#split panes according to config
 			tmux split-window -t $name:$i $wpane
 		done
+		#set the layout for each window
 		tmux select-layout -t $name:$i $winlayout
 		((i+=1));
 	done
 
+	# select the main window and join the tmux session
 	tmux select-window -t $cmd
 	tmux attach-session -E -t $name
 }
@@ -111,7 +135,7 @@ case $1 in
 		fi
 		;;
 	help)
-	echo "Tmuxinator Commands:
+	echo "TmuxinatorCommands:
 	new  <name>: new config with name of <name>.
 	o <name>: open tmux <name> session.
 	edit <name>: edit <name> config.
