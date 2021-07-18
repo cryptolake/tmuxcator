@@ -130,6 +130,7 @@ case $1 in
 		if [ ! -z "$2" -a "$2" != " " ]; then 
 		cfile=$cfdir/$2
 		rm $cfile
+		echo "Deleted: " $cfile
 		else 
 			echo "check the <name> of the project"
 		fi
