@@ -19,7 +19,7 @@ template="
  \n
  \n
  # additional windows \n
- #Always put the window definition inside '' like and example above. \n
+ #Always put the window definition inside '' like the example below. \n
  \n
  #windows=('window_cmd:pane1_cmd'.'window2_cmd:pane2_cmd') \n
  #each window definition is seperated by . \n
