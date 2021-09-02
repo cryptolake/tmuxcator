@@ -2,8 +2,8 @@
 create-config()
 {
 	# create config directory if not exist
-	if [ ! -d $cfdir ]; then
-		mkdir $cfdir
+	if [ ! -d "$cfdir" ]; then
+		mkdir "$cfdir"
 	fi
 # standard template layout 
 template="
@@ -26,25 +26,25 @@ template="
  windows=('python:gdb,main-vertical'.'zsh,main-vertical') \n
 "
 # create config file if non existant
-	if [ ! -f $cfile ]; then
-		touch $cfile
-		echo -e $template > $cfile
+	if [ ! -f "$cfile" ]; then
+		touch "$cfile"
+		echo -e "$template" > "$cfile"
 	fi
-	$EDITOR $cfile
+	"$EDITOR" "$cfile"
 }
 
 tmuxination()
 {
 
 	#source the config file
-	source $cfile
+	source "$cfile"
 
 	#create project root if non existant
-	if [ -f $root ]; then
-		mkdir -pv $root
-		cd $root
+	if [ -f "$root" ]; then
+		mkdir -pv "$root"
+		cd "$root"
 	else
-		cd $root
+		cd "$root"
 	fi
 
 	#use . as seperator in bash arrays
@@ -101,26 +101,26 @@ cfdir="$XDG_CONFIG_HOME/tmuxcator"
 case $1 in
 	new)
 		if [ ! -z "$2" -a "$2" != " " ]; then 
-		cfile=$cfdir/$2
+		cfile="$cfdir"/"$2"
 		create-config
 		else 
 			echo "check the <name> of the project"
 		fi
 		;;
 	list)
-		ls $cfdir
+		ls "$cfdir"
 		;;
 	edit)
 	if [ ! -z "$2" -a "$2" != " " ]; then 
-		cfile=$cfdir/$2
-		$EDITOR $cfile
+		cfile="$cfdir"/"$2"
+		$EDITOR "$cfile"
 		else 
 			echo "check the <name> of the project"
 	fi
 		;;
 	o)
 		if [ ! -z "$2" -a "$2" != " " ]; then 
-		cfile=$cfdir/$2
+		cfile="$cfdir"/"$2"
 		tmuxination
 		else 
 			echo "check the <name> of the project"
@@ -128,9 +128,9 @@ case $1 in
 		;;
 	rm)
 		if [ ! -z "$2" -a "$2" != " " ]; then 
-		cfile=$cfdir/$2
-		rm $cfile
-		echo "Deleted: " $cfile
+		cfile="$cfdir"/"$2"
+		rm "$cfile"
+		echo "Deleted: " "$cfile"
 		else 
 			echo "check the <name> of the project"
 		fi
