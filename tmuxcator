@@ -99,7 +99,7 @@ tmuxination()
 cfdir="$XDG_CONFIG_HOME/tmuxcator"
 
 case $1 in
-	new)
+	new | n)
 		if [ ! -z "$2" -a "$2" != " " ]; then 
 		cfile="$cfdir"/"$2"
 		create-config
@@ -107,10 +107,10 @@ case $1 in
 			echo "check the <name> of the project"
 		fi
 		;;
-	list)
+	list | l)
 		ls "$cfdir"
 		;;
-	edit)
+	edit | e)
 	if [ ! -z "$2" -a "$2" != " " ]; then 
 		cfile="$cfdir"/"$2"
 		$EDITOR "$cfile"
@@ -118,7 +118,7 @@ case $1 in
 			echo "check the <name> of the project"
 	fi
 		;;
-	o)
+	open | o)
 		if [ ! -z "$2" -a "$2" != " " ]; then 
 		cfile="$cfdir"/"$2"
 		tmuxination
@@ -126,7 +126,7 @@ case $1 in
 			echo "check the <name> of the project"
 		fi
 		;;
-	rm)
+	remove | rm)
 		if [ ! -z "$2" -a "$2" != " " ]; then 
 		cfile="$cfdir"/"$2"
 		rm "$cfile"
@@ -135,22 +135,22 @@ case $1 in
 			echo "check the <name> of the project"
 		fi
 		;;
-	help)
+	help | h)
 	echo "TmuxinatorCommands:
-	new  <name>: new config with name of <name>.
-	o <name>: open tmux <name> session.
-	edit <name>: edit <name> config.
-	list : list configs.
-	rm <name>: delete <name> config.
-	help : show this."
+	new/n  <name>: new config with name of <name>.
+	open/o <name>: open tmux <name> session.
+	edit/e <name>: edit <name> config.
+	list/l : list configs.
+	remove/rm <name>: delete <name> config.
+	help/h : show this."
 		;;
 	*)
 	echo "Tmuxinator Commands:
-	new  <name>: new config with name of <name>.
-	o <name>: open tmux <name> session.
-	edit <name>: edit <name> config.
-	list : list configs.
-	rm <name>: delete <name> config.
-	help : show this."
+	new/n  <name>: new config with name of <name>.
+	open/o <name>: open tmux <name> session.
+	edit/e <name>: edit <name> config.
+	list/l : list configs.
+	remove/rm <name>: delete <name> config.
+	help/h : show this."
 		;;
 esac
