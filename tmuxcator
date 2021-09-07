@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 create-config()
 {
 	# create config directory if not exist
@@ -57,15 +57,15 @@ tmuxination()
 	cmd="$(echo $main_panes | cut -d':' -f 1)"
 
 	#launch the tmux session
-	tmux new-session -d -s $name $cmd
+	tmux new-session -d -s "$name" $cmd
 	
 	#assign main panes
 	panes=($(echo $main_panes | tr ":" "."))
 	for pane in ${panes[*]:1}; do
-		tmux split-window -t $name:0 $pane;
+		tmux split-window -t "$name":0 $pane;
 	done
 	# set the layout
-	tmux select-layout -t $name:0 $main_layout
+	tmux select-layout -t "$name":0 $main_layout
 
   ((i=1))
   	# for each window in config 
@@ -76,23 +76,23 @@ tmuxination()
 		window="$(echo $window | cut -d',' -f 1)";
 		cmdw="$(echo $window | cut -d':' -f 1)";
 		#echo 'making window '$i
-		tmux new-window -t $name:$i $cmdw;
+		tmux new-window -t "$name":$i $cmdw;
 		#sleep 1
 
 		wpanes=($(echo $window | tr ":" "."))
 		for wpane in "${wpanes[@]:1}"; do
 			#echo 'making pane '$wpane' in window '$i
 			#split panes according to config
-			tmux split-window -t $name:$i $wpane
+			tmux split-window -t "$name":$i $wpane
 		done
 		#set the layout for each window
-		tmux select-layout -t $name:$i $winlayout
+		tmux select-layout -t "$name":$i $winlayout
 		((i+=1));
 	done
 
 	# select the main window and join the tmux session
 	tmux select-window -t $cmd
-	tmux attach-session -E -t $name
+	tmux attach-session -E -t "$name"
 }
 
 
