@@ -5,41 +5,36 @@ create-config()
 	if [ ! -d "$cfdir" ]; then
 		mkdir "$cfdir"
 	fi
-# standard template layout 
-template="
-#!/bin/bash  \n
- #project name and direcotry\n
- name=projname \n
- root=~/Documents/prog/ \n
- \n
- #panes with 'pane1_cmd:pane2_cmd,layout'\n
- main_panes='nvim:zsh,main-vertical'\n
- \n
- \n
- \n
- \n
- # additional windows \n
- #Always put the window definition inside '' like the example below. \n
- \n
- #windows=('window_cmd:pane1_cmd'.'window2_cmd:pane2_cmd') \n
- #each window definition is seperated by . \n
- windows=('python:gdb,main-vertical'.'zsh,main-vertical') \n
+	# standard template layout 
+	template="#!/bin/bash  \n
+#project name and direcotry\n
+name=projname \n
+root=~/Documents/prog/ \n
+\n
+#panes with 'pane1_cmd:pane2_cmd,layout'\n
+#layouts even-horizontal, even-vertical, main-horizontal, main-vertical or tiled.
+main_panes='nvim:zsh,main-vertical'\n
+\n
+# additional windows \n
+#Always put the window definition inside '' like the example below. \n
+\n
+#windows=('window_cmd:pane1_cmd'.'window2_cmd:pane2_cmd') \n
+#each window definition is seperated by . \n
+windows=('python:gdb,main-vertical'.'zsh,main-vertical') \n
 "
-# create config file if non existant
-	if [ ! -f "$cfile" ]; then
-		touch "$cfile"
-		echo -e "$template" > "$cfile"
-	fi
-	"$EDITOR" "$cfile"
-}
+		# create config file if non existant
+		if [ ! -f "$cfile" ]; then
+			touch "$cfile"
+			echo -e "$template" > "$cfile"
+		fi
+		"$EDITOR" "$cfile"
+	}
 
 tmuxination()
 {
 
-	#source the config file
 	source "$cfile"
 
-	#create project root if non existant
 	if [ -f "$root" ]; then
 		mkdir -pv "$root"
 		cd "$root"
@@ -56,19 +51,15 @@ tmuxination()
 	main_panes="$(echo $main_panes | cut -d',' -f 1)"
 	cmd="$(echo $main_panes | cut -d':' -f 1)"
 
-	#launch the tmux session
 	tmux new-session -d -s "$name" $cmd
-	
-	#assign main panes
+
 	panes=($(echo $main_panes | tr ":" "."))
 	for pane in ${panes[*]:1}; do
 		tmux split-window -t "$name":0 $pane;
 	done
-	# set the layout
 	tmux select-layout -t "$name":0 $main_layout
 
-  ((i=1))
-  	# for each window in config 
+	((i=1))
 	for window in ${windows[*]};
 	do
 		winlayout="$(echo $window | cut -d',' -f 2)";
@@ -96,61 +87,64 @@ tmuxination()
 }
 
 
-cfdir="$XDG_CONFIG_HOME/tmuxcator"
-
-case $1 in
-	new | n)
-		if [ ! -z "$2" -a "$2" != " " ]; then 
-		cfile="$cfdir"/"$2"
-		create-config
-		else 
-			echo "check the <name> of the project"
-		fi
-		;;
-	list | l)
-		ls "$cfdir"
-		;;
-	edit | e)
-	if [ ! -z "$2" -a "$2" != " " ]; then 
-		cfile="$cfdir"/"$2"
-		$EDITOR "$cfile"
-		else 
-			echo "check the <name> of the project"
-	fi
-		;;
-	open | o)
-		if [ ! -z "$2" -a "$2" != " " ]; then 
-		cfile="$cfdir"/"$2"
-		tmuxination
-		else 
-			echo "check the <name> of the project"
-		fi
-		;;
-	remove | rm)
-		if [ ! -z "$2" -a "$2" != " " ]; then 
-		cfile="$cfdir"/"$2"
-		rm "$cfile"
-		echo "Deleted: " "$cfile"
-		else 
-			echo "check the <name> of the project"
-		fi
-		;;
-	help | h)
-	echo "TmuxinatorCommands:
-	new/n  <name>: new config with name of <name>.
-	open/o <name>: open tmux <name> session.
-	edit/e <name>: edit <name> config.
-	list/l : list configs.
-	remove/rm <name>: delete <name> config.
-	help/h : show this."
-		;;
-	*)
-	echo "Tmuxinator Commands:
-	new/n  <name>: new config with name of <name>.
-	open/o <name>: open tmux <name> session.
-	edit/e <name>: edit <name> config.
-	list/l : list configs.
-	remove/rm <name>: delete <name> config.
-	help/h : show this."
-		;;
-esac
+cfdir="${XDG_CONFIG_HOME:-$HOME/.config}/tmuxcator"
+if [ -d "$cfdir" ]; then
+	case $1 in
+		new | n)
+			if [ ! -z "$2" -a "$2" != " " ]; then 
+				cfile="$cfdir"/"$2"
+				create-config
+			else 
+				echo "check the <name> of the project"
+			fi
+			;;
+		list | l)
+			ls "$cfdir"
+			;;
+		edit | e)
+			cfile="$cfdir"/"$2"
+			if [ ! -z "$2" -a "$2" != " " -a -f "$cfile" ]; then 
+				$EDITOR "$cfile"
+			else 
+				echo "check the <name> of the project"
+			fi
+			;;
+		open | o)
+			cfile="$cfdir"/"$2"
+			if [ ! -z "$2" -a "$2" != " " -a -f "$cfile" ]; then 
+				tmuxination
+			else 
+				echo "check the <name> of the project"
+			fi
+			;;
+		remove | rm)
+			cfile="$cfdir"/"$2"
+			if [ ! -z "$2" -a "$2" != " " -a -f "$cfile" ]; then 
+				rm "$cfile"
+				echo "Deleted: " "$cfile"
+			else 
+				echo "check the <name> of the project"
+			fi
+			;;
+		help | h)
+			echo "TmuxinatorCommands:
+			new/n  <name>: new config with name of <name>.
+			open/o <name>: open tmux <name> session.
+			edit/e <name>: edit <name> config.
+			list/l : list configs.
+			remove/rm <name>: delete <name> config.
+			help/h : show this."
+			;;
+		*)
+			echo "Tmuxinator Commands:
+			new/n  <name>: new config with name of <name>.
+			open/o <name>: open tmux <name> session.
+			edit/e <name>: edit <name> config.
+			list/l : list configs.
+			remove/rm <name>: delete <name> config.
+			help/h : show this."
+			;;
+	esac
+else
+	echo "Config direcoty \"~/.config/tmuxcator\" Doesn't exist"
+fi
