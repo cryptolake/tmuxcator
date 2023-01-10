@@ -6,21 +6,8 @@ create-config()
 		mkdir "$cfdir"
 	fi
 	# standard template layout 
-	template="#!/bin/bash  \n
-#project name and direcotry\n
-name=projname \n
-root=~/Documents/prog/ \n
-\n
-#panes with 'pane1_cmd:pane2_cmd,layout'\n
-#layouts even-horizontal, even-vertical, main-horizontal, main-vertical or tiled.
-main_panes='nvim:zsh,main-vertical'\n
-\n
-# additional windows \n
-#Always put the window definition inside '' like the example below. \n
-\n
-#windows=('window_cmd:pane1_cmd'.'window2_cmd:pane2_cmd') \n
-#each window definition is seperated by . \n
-windows=('python:gdb,main-vertical'.'zsh,main-vertical') \n
+	template="#!/bin/bash\n#project name and direcotry\n
+name=projname\nroot=~/Documents/prog/\n\n# windows\n#Always put the window definition inside '' like the example below. \n#windows=('window_cmd:pane1_cmd'.'window2_cmd:pane2_cmd') \n#each window definition is seperated by . \nwindows=('python:gdb,main-vertical'.'zsh,main-vertical') \n
 "
 		# create config file if non existant
 		if [ ! -f "$cfile" ]; then
@@ -46,18 +33,6 @@ tmuxination()
 	local IFS="."
 
 	#assign main layout and commands
-	main_layout="$(echo $main_panes | cut -d',' -f 2)"
-	main_layout="$(echo $main_layout | cut -d' ' -f 1)"
-	main_panes="$(echo $main_panes | cut -d',' -f 1)"
-	cmd="$(echo $main_panes | cut -d':' -f 1)"
-
-	tmux new-session -d -s "$name" $cmd
-
-	panes=($(echo $main_panes | tr ":" "."))
-	for pane in ${panes[*]:1}; do
-		tmux split-window -t "$name":0 $pane;
-	done
-	tmux select-layout -t "$name":0 $main_layout
 
 	((i=1))
 	for window in ${windows[*]};
@@ -66,9 +41,11 @@ tmuxination()
 		winlayout="$(echo $winlayout | cut -d' ' -f 1)";
 		window="$(echo $window | cut -d',' -f 1)";
 		cmdw="$(echo $window | cut -d':' -f 1)";
-		#echo 'making window '$i
-		tmux new-window -t "$name":$i $cmdw;
-		#sleep 1
+		if [ "$i" -eq 1 ]; then
+			tmux new-session -d -s "$name" $cmdw;
+		else
+			tmux new-window -t "$name":$i $cmdw;
+		fi
 
 		wpanes=($(echo $window | tr ":" "."))
 		for wpane in "${wpanes[@]:1}"; do
@@ -82,7 +59,7 @@ tmuxination()
 	done
 
 	# select the main window and join the tmux session
-	tmux select-window -t $cmd
+	tmux select-window -t "$name":1
 	tmux attach-session -E -t "$name"
 }
 
