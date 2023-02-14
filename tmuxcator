@@ -104,22 +104,22 @@ if [ -d "$cfdir" ]; then
 			fi
 			;;
 		help | h)
-			echo "TmuxinatorCommands:
-			new/n  <name>: new config with name of <name>.
-			open/o <name>: open tmux <name> session.
-			edit/e <name>: edit <name> config.
-			list/l : list configs.
-			remove/rm <name>: delete <name> config.
-			help/h : show this."
+			echo "	TmuxinatorCommands:
+	new/n  <name>: new config with name of <name>.
+	open/o <name>: open tmux <name> session.
+	edit/e <name>: edit <name> config.
+	list/l : list configs.
+	remove/rm <name>: delete <name> config.
+	help/h : show this."
 			;;
 		*)
-			echo "Tmuxinator Commands:
-			new/n  <name>: new config with name of <name>.
-			open/o <name>: open tmux <name> session.
-			edit/e <name>: edit <name> config.
-			list/l : list configs.
-			remove/rm <name>: delete <name> config.
-			help/h : show this."
+			echo "	Tmuxinator Commands:
+	new/n  <name>: new config with name of <name>.
+	open/o <name>: open tmux <name> session.
+	edit/e <name>: edit <name> config.
+	list/l : list configs.
+	remove/rm <name>: delete <name> config.
+	help/h : show this."
 			;;
 	esac
 else
